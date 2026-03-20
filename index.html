@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJA | Bold & Maximalist Studio</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================================
+           CSS VARIABLES & RESET
+           ================================ */
+        :root {
+            /* Colors */
+            --bg: #F7F3ED; /* warm off-white */
+            --primary: #FF4D00; /* electric orange-red */
+            --secondary: #1A1AFF; /* electric blue */
+            --dark: #0D0D0D; /* near black */
+            --yellow: #FFD600; /* bright yellow */
+            --muted: #999999;
+            --white: #FFFFFF;
+
+            /* Typography */
+            --font-display: 'Bebas Neue', cursive;
+            --font-elegant: 'Playfair Display', serif;
+            --font-body: 'DM Sans', sans-serif;
+            --font-accent: 'Space Mono', monospace;
+            
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg); color: var(--dark); font-family: var(--font-body);
+            overflow-x: hidden; line-height: 1.5; cursor: none;
+        }
+
+        a, button, input, textarea, select { color: inherit; text-decoration: none; font-family: inherit; cursor: none; border: none; outline: none; background: none; }
+        img { max-width: 100%; height: auto; display: block; }
+        ul { list-style: none; }
+
+        /* Typography Utilities */
+        .text-orange { color: var(--primary); }
+        .text-blue { color: var(--secondary); }
+        .text-yellow { color: var(--yellow); }
+        .text-white { color: var(--white); }
+        .text-muted { color: var(--muted); }
+        
+        .stroke-text { -webkit-text-stroke: 2px var(--primary); color: transparent; }
+        .stroke-white { -webkit-text-stroke: 2px var(--white); color: transparent; }
+
+        /* ================================
+           CUSTOM CURSOR & PROGRESS
+           ================================ */
+        .cursor-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: var(--primary); border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.1s linear; }
+        .cursor-follower { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border: 2px solid var(--primary); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: width 0.3s var(--ease), height 0.3s var(--ease), background 0.3s; }
+        
+        body.hovering .cursor-follower { width: 60px; height: 60px; background: rgba(255, 77, 0, 0.2); }
+
+        .scroll-progress { position: fixed; top: 0; left: 0; width: 0%; height: 4px; background: var(--primary); z-index: 1000; }
+
+        /* ================================
+           PRELOADER
+           ================================ */
+        #preloader { position: fixed; inset: 0; background: var(--white); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; transition: transform 0.8s var(--ease); }
+        #preloader.slide-up { transform: translateY(-100%); }
+
+        .pre-title { font-family: var(--font-display); font-size: clamp(8rem, 25vw, 20rem); color: var(--primary); line-height: 0.8; display: flex; overflow: hidden; }
+        .pre-letter { display: inline-block; animation: slamIn 0.8s var(--ease) forwards; opacity: 0; }
+        
+        .pre-letter:nth-child(1) { transform: translateX(-100px); animation-delay: 0.1s; }
+        .pre-letter:nth-child(2) { transform: translateY(-100px); animation-delay: 0.3s; }
+        .pre-letter:nth-child(3) { transform: translateX(100px); animation-delay: 0.5s; }
+
+        @keyframes slamIn { to { transform: translate(0); opacity: 1; } }
+
+        .pre-subtitle { font-family: var(--font-accent); font-size: 1rem; color: var(--dark); margin-top: 1rem; height: 1.5rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+        
+        .pre-sweep { position: absolute; bottom: 30%; left: 0; width: 0%; height: 5px; background: var(--primary); animation: sweep 1s cubic-bezier(0.7, 0, 0.3, 1) forwards 1.8s; }
+        @keyframes sweep { to { width: 100%; } }
+
+        /* ================================
+           MARQUEE TICKER ANIMATION
+           ================================ */
+        .marquee-wrap { overflow: hidden; white-space: nowrap; width: 100%; background: var(--yellow); padding: 15px 0; border-top: 2px solid var(--dark); border-bottom: 2px solid var(--dark); }
+        .marquee { display: inline-block; font-family: var(--font-accent); font-size: 1.2rem; font-weight: 700; text-transform: uppercase; color: var(--dark); animation: marqueeAnim 20s linear infinite; }
+        .marquee.reverse { background: var(--primary); color: var(--white); animation-direction: reverse; }
+        @keyframes marqueeAnim { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* ================================
+           SHARED ANIMATIONS
+           ================================ */
+        .reveal-clip { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); transform: translateY(20px); transition: clip-path 1s var(--ease), transform 1s var(--ease); }
+        .reveal-clip.active { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: translateY(0); }
+        
+        /* ================================
+           NAVBAR (Minimal Brutalist)
+           ================================ */
+        header { position: absolute; top: 0; left: 0; width: 100%; padding: 30px 5%; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-family: var(--font-display); font-size: 3rem; color: var(--dark); line-height: 1; }
+        
+        .hamburger { display: flex; flex-direction: column; gap: 6px; width: 40px; cursor: none; z-index: 101; }
+        .hamburger span { width: 100%; height: 4px; background: var(--dark); transition: 0.3s; }
+        
+        .full-nav { position: fixed; inset: 0; background: var(--dark); color: var(--white); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2rem; transform: translateY(-100%); transition: transform 0.6s var(--ease); }
+        .full-nav.open { transform: translateY(0); }
+        .full-nav a { font-family: var(--font-display); font-size: 5rem; letter-spacing: 2px; padding: 10px; transition: color 0.3s; }
+        .full-nav a:hover { color: var(--primary); }
+
+        /* ================================
+           HERO SECTION (Split Screen)
+           ================================ */
+        .hero { position: relative; width: 100%; height: calc(100vh - 60px); display: flex; overflow: hidden; /* minus marquee height */ }
+        
+        .hero-left { flex: 0 0 55%; padding: 0 5%; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2; }
+        .hero-right { position: absolute; top: 0; right: 0; width: 55%; height: 100%; clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%); z-index: 1; }
+
+        .hero-img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-img-overlay { position: absolute; inset: 0; background: var(--primary); mix-blend-mode: multiply; opacity: 0.8; }
+
+        .hero-tag { font-family: var(--font-accent); font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem; }
+        
+        .hero-title { font-family: var(--font-display); font-size: clamp(5rem, 10vw, 9rem); line-height: 0.85; margin-bottom: 1.5rem; }
+        .hero-title span { display: block; }
+
+        .hero-desc { font-family: var(--font-elegant); font-size: 1.8rem; font-style: italic; color: var(--dark); margin-bottom: 3rem; }
+
+        .btn-group { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        .btn { font-family: var(--font-accent); font-size: 1rem; font-weight: 700; text-transform: uppercase; padding: 18px 36px; display: inline-flex; align-items: center; border: 2px solid transparent; transition: all 0.3s; }
+        .btn-solid { background: var(--primary); color: var(--dark); border-color: var(--dark); }
+        .btn-solid:hover { background: var(--white); color: var(--primary); border-color: var(--primary); }
+        .btn-outline { background: transparent; color: var(--dark); border-color: var(--dark); }
+        .btn-outline:hover { background: var(--dark); color: var(--white); }
+
+        /* ================================
+           STATS TICKER
+           ================================ */
+        .stats-section { background: var(--dark); padding: 40px 0; border-top: 4px solid var(--primary); }
+        .stats-wrap { display: flex; justify-content: space-around; flex-wrap: wrap; padding: 0 5%; }
+        .stat-block { text-align: center; position: relative; padding: 0 20px; }
+        .stat-block:not(:last-child)::after { content: ''; position: absolute; right: -20px; top: 10%; height: 80%; width: 2px; background: var(--primary); }
+        
+        .stat-num { font-family: var(--font-display); font-size: 4rem; color: var(--white); line-height: 1; }
+        .stat-label { font-family: var(--font-accent); font-size: 0.9rem; color: var(--primary); font-weight: 700; text-transform: uppercase; margin-top: 5px; }
+
+        /* ================================
+           ABOUT SECTION (Brutalist Grid)
+           ================================ */
+        .about-section { padding: 120px 5%; background: var(--white); position: relative; overflow: hidden; }
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1400px; margin: 0 auto; position: relative; z-index: 2; }
+        
+        .img-grid-wrap { position: relative; }
+        .img-yellow-box { position: absolute; top: 40px; left: -30px; width: 100%; height: 100%; background: var(--yellow); border: 2px solid var(--dark); z-index: 1; }
+        .img-frame { position: relative; z-index: 2; border: 8px solid var(--primary); width: 100%; padding: 10px; background: var(--white); }
+        .about-img { width: 100%; display: block; filter: grayscale(10%) contrast(1.2); }
+
+        .about-tag { font-family: var(--font-accent); font-size: 1.1rem; color: var(--primary); font-weight: 700; margin-bottom: 1rem; }
+        .about-title { font-family: var(--font-display); font-size: clamp(4rem, 8vw, 7rem); color: var(--dark); line-height: 0.9; margin-bottom: 2rem; }
+        
+        .about-text { font-family: var(--font-body); font-size: 1.15rem; color: var(--dark); margin-bottom: 2rem; }
+        .about-quote { border-left: 6px solid var(--secondary); padding-left: 20px; font-family: var(--font-elegant); font-size: 2rem; font-style: italic; font-weight: 600; line-height: 1.2; margin-bottom: 3rem; }
+
+        /* ================================
+           SERVICES SECTION (Numbered List)
+           ================================ */
+        .services-section { background: var(--dark); padding: 120px 5%; position: relative; overflow: hidden; }
+        .service-bg-text { position: absolute; bottom: -5%; left: 0; width: 100%; font-family: var(--font-display); font-size: 25vw; color: rgba(255,255,255,0.03); line-height: 0.8; white-space: nowrap; pointer-events: none; }
+        
+        .sec-num { position: absolute; top: 40px; right: 5%; font-family: var(--font-display); font-size: 15rem; color: rgba(255, 77, 0, 0.1); line-height: 0.8; pointer-events: none; }
+        
+        .services-list { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
+        
+        .service-row { display: grid; grid-template-columns: 80px 1fr 1fr 50px; align-items: center; padding: 40px 0; border-bottom: 2px solid var(--primary); transition: all 0.4s; position: relative; transform: translateX(-50px); opacity: 0; }
+        .service-row.slide-in { transform: translateX(0); opacity: 1; }
+        
+        .srv-num { font-family: var(--font-accent); font-size: 1.5rem; color: var(--primary); font-weight: 700; }
+        .srv-title { font-family: var(--font-display); font-size: 3rem; color: var(--white); transition: color 0.3s; }
+        .srv-desc { font-family: var(--font-body); font-size: 1rem; color: var(--muted); padding-right: 2vw; transition: color 0.3s; }
+        .srv-arrow { font-size: 2.5rem; color: var(--dark); opacity: 0; transition: all 0.3s; font-family: var(--font-body); }
+        
+        .service-row::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); transform: scaleY(0); transform-origin: bottom; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: -1; }
+        
+        .service-row:hover::before { transform: scaleY(1); }
+        .service-row:hover .srv-title { color: var(--dark); }
+        .service-row:hover .srv-desc { color: var(--dark); font-weight: 500; }
+        .service-row:hover .srv-num { color: var(--dark); }
+        .service-row:hover .srv-arrow { opacity: 1; transform: translateX(10px); }
+
+        /* ================================
+           PORTFOLIO SECTION (Magazine Grid)
+           ================================ */
+        .portfolio-section { background: var(--bg); padding: 120px 5%; }
+        
+        .port-header { text-align: center; margin-bottom: 4rem; }
+        .port-title { font-family: var(--font-display); font-size: clamp(4rem, 8vw, 7rem); color: var(--dark); line-height: 0.9; }
+        
+        .filter-group { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 40px; }
+        .pill { font-family: var(--font-accent); font-size: 0.9rem; font-weight: 700; text-transform: uppercase; padding: 12px 24px; border: 2px solid var(--dark); transition: all 0.3s; }
+        .pill.active { background: var(--dark); color: var(--white); }
+        .pill:hover:not(.active) { background: var(--primary); border-color: var(--primary); color: var(--white); }
+
+        .port-grid { display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: 400px; gap: 20px; max-width: 1400px; margin: 0 auto; }
+        
+        .port-item { position: relative; overflow: hidden; border: 2px solid var(--dark); transform: scale(0.95); opacity: 0; transition: transform 0.6s var(--ease), opacity 0.6s var(--ease); }
+        .port-item.zoom-in { transform: scale(1); opacity: 1; }
+        
+        /* Asymmetric Layout */
+        .port-item:nth-child(1) { grid-column: span 8; }
+        .port-item:nth-child(2) { grid-column: span 4; }
+        .port-item:nth-child(3), .port-item:nth-child(4), .port-item:nth-child(5) { grid-column: span 4; }
+        .port-item:nth-child(6) { grid-column: span 4; }
+        .port-item:nth-child(7) { grid-column: span 8; }
+
+        .port-img { width: 100%; height: 100%; object-fit: cover; transition: filter 0.5s, transform 0.5s; }
+        
+        .port-overlay { position: absolute; inset: 0; background: rgba(255, 77, 0, 0.9); opacity: 0; transition: opacity 0.4s; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; }
+        
+        .port-num { font-family: var(--font-display); font-size: 6rem; color: var(--white); line-height: 1; transform: scale(0.8); transition: transform 0.4s var(--ease); }
+        .port-name { font-family: var(--font-accent); font-size: 1.2rem; font-weight: 700; color: var(--dark); text-transform: uppercase; transform: translateY(20px); transition: transform 0.4s var(--ease); }
+
+        .port-item:hover .port-img { filter: grayscale(100%); transform: scale(1.05); }
+        .port-item:hover .port-overlay { opacity: 1; }
+        .port-item:hover .port-num { transform: scale(1); }
+        .port-item:hover .port-name { transform: translateY(0); }
+
+        .hidden { display: none !important; }
+
+        /* ================================
+           PROCESS SECTION (Yellow Horizontal)
+           ================================ */
+        .process-section { background: var(--yellow); padding: 100px 5%; border-top: 4px solid var(--dark); border-bottom: 4px solid var(--dark); }
+        
+        .process-head { text-align: center; margin-bottom: 60px; }
+        .process-title { font-family: var(--font-display); font-size: 5rem; color: var(--dark); line-height: 1; }
+
+        .process-wrap { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; flex-wrap: wrap; gap: 2vw; }
+        
+        .process-step { flex: 1; min-width: 200px; padding: 30px; border: 4px solid var(--dark); background: var(--white); transition: all 0.4s; transform: translateY(40px); opacity: 0; }
+        .process-step.slide-up { transform: translateY(0); opacity: 1; }
+        
+        .proc-num { font-family: var(--font-display); font-size: 5rem; color: var(--dark); line-height: 0.8; margin-bottom: 10px; transition: color 0.3s; }
+        .proc-name { font-family: var(--font-body); font-weight: 700; font-size: 1.2rem; color: var(--dark); margin-bottom: 10px; text-transform: uppercase; transition: color 0.3s; }
+        .proc-desc { font-family: var(--font-body); font-size: 0.95rem; color: var(--muted); }
+
+        .proc-arrow { font-family: var(--font-body); font-size: 3rem; color: var(--dark); font-weight: bold; }
+
+        .process-step:hover { background: var(--dark); transform: translateY(-10px); }
+        .process-step:hover .proc-num, .process-step:hover .proc-name { color: var(--yellow); }
+
+        /* ================================
+           TESTIMONIALS (Magazine Pull Quote)
+           ================================ */
+        .test-section { background: var(--white); padding: 120px 5%; }
+        .test-container { max-width: 1200px; margin: 0 auto; text-align: center; }
+        
+        .main-quote { margin-bottom: 80px; position: relative; }
+        .quote-mark { font-family: var(--font-display); font-size: 12rem; color: var(--primary); line-height: 0.5; margin-bottom: 20px; }
+        .main-q-text { font-family: var(--font-elegant); font-size: clamp(1.8rem, 4vw, 2.5rem); font-style: italic; color: var(--dark); line-height: 1.4; margin-bottom: 30px; }
+        .main-q-author { font-family: var(--font-accent); font-size: 1rem; color: var(--primary); font-weight: 700; text-transform: uppercase; }
+
+        .sub-quotes { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .sub-card { padding: 40px; border: 2px solid var(--dark); text-align: left; transition: all 0.3s; }
+        .sub-card:hover { border-color: var(--primary); background: #FFF5F0; }
+        .sub-card p { font-family: var(--font-elegant); font-size: 1.3rem; font-style: italic; color: var(--dark); margin-bottom: 20px; }
+        .sub-card span { font-family: var(--font-accent); font-size: 0.9rem; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+
+        /* ================================
+           CONTACT SECTION (Bold Split)
+           ================================ */
+        .contact-section { display: flex; min-height: 80vh; border-top: 4px solid var(--dark); }
+        .cont-left { flex: 1; background: var(--dark); padding: 80px 5%; display: flex; flex-direction: column; justify-content: center; }
+        .cont-right { flex: 1; background: var(--bg); padding: 80px 5%; display: flex; flex-direction: column; justify-content: center; }
+
+        .cont-title { font-family: var(--font-display); font-size: clamp(4rem, 8vw, 7rem); line-height: 0.9; margin-bottom: 40px; }
+        .cont-title span { display: block; }
+
+        .cont-details { font-family: var(--font-accent); font-size: 1.1rem; color: var(--white); line-height: 2; margin-bottom: 40px; }
+        
+        .form-group { margin-bottom: 35px; position: relative; }
+        .form-label { font-family: var(--font-accent); font-size: 0.85rem; color: var(--primary); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 10px; }
+        .form-control { width: 100%; border-bottom: 2px solid var(--dark); padding: 10px 0; font-size: 1.2rem; color: var(--dark); transition: border-color 0.3s; }
+        .form-control:focus { border-color: var(--primary); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+
+        .btn-submit { width: 100%; padding: 25px; background: var(--dark); color: var(--white); font-family: var(--font-accent); font-size: 1.2rem; font-weight: 700; text-transform: uppercase; border: 2px solid var(--dark); transition: all 0.3s; margin-top: 20px; }
+        .btn-submit:hover { background: var(--primary); border-color: var(--primary); }
+
+        /* ================================
+           FOOTER
+           ================================ */
+        footer { background: var(--dark); overflow: hidden; border-top: 2px solid var(--white); }
+        .footer-watermark { font-family: var(--font-display); font-size: 28vw; color: var(--primary); line-height: 0.7; text-align: center; white-space: nowrap; }
+        
+        .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding: 40px 5%; border-top: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; gap: 20px; }
+        .f-logo { font-family: var(--font-display); font-size: 2rem; color: var(--white); }
+        .f-copy { font-family: var(--font-accent); font-size: 0.9rem; color: var(--muted); }
+        .f-links { display: flex; gap: 30px; }
+        .f-links a { font-family: var(--font-accent); font-size: 0.9rem; color: var(--white); text-transform: uppercase; font-weight: 700; transition: color 0.3s; }
+        .f-links a:hover { color: var(--primary); }
+
+        .whatsapp-float { position: fixed; bottom: 30px; right: 30px; background: var(--primary); color: var(--dark); font-family: var(--font-accent); font-weight: 700; padding: 15px 25px; border-radius: 50px; border: 2px solid var(--dark); z-index: 1000; box-shadow: 4px 4px 0px var(--dark); transition: transform 0.2s, box-shadow 0.2s; animation: bounce 2s infinite; }
+        .whatsapp-float:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--dark); }
+        
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* ================================
+           RESPONSIVE
+           ================================ */
+        @media (max-width: 1024px) {
+            .about-grid { grid-template-columns: 1fr; }
+            .img-grid-wrap { max-width: 600px; margin: 0 auto; }
+            .service-row { grid-template-columns: 50px 1fr 1fr 30px; }
+            .port-grid { grid-template-columns: repeat(2, 1fr); }
+            .port-item:nth-child(n) { grid-column: span 1; }
+            .process-wrap { flex-direction: column; }
+            .proc-arrow { display: none; }
+            .contact-section { flex-direction: column; }
+        }
+
+        @media (max-width: 768px) {
+            .hero { flex-direction: column; height: auto; padding: 100px 0 0 0; }
+            .hero-left { padding: 40px 5%; text-align: center; }
+            .hero-right { position: relative; width: 100%; height: 50vh; clip-path: none; margin-top: 20px; }
+            .btn-group { justify-content: center; }
+            
+            .stats-wrap { flex-direction: column; gap: 30px; }
+            .stat-block:not(:last-child)::after { display: none; }
+            
+            .service-row { grid-template-columns: 1fr; text-align: center; gap: 15px; }
+            .srv-desc { padding: 0; }
+            .srv-arrow { display: none; }
+            
+            .port-grid { grid-template-columns: 1fr; }
+            .sub-quotes { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            
+            /* Disable Cursor */
+            body { cursor: auto; }
+            .cursor-dot, .cursor-follower { display: none; }
+            a, button, input, textarea, select { cursor: pointer; }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- PROGRESS BAR & CURSOR -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    <div class="cursor-dot"></div>
+    <div class="cursor-follower"></div>
+    
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="pre-title">
+            <span class="pre-letter">D</span><span class="pre-letter">J</span><span class="pre-letter">A</span>
+        </div>
+        <div class="pre-subtitle" id="typewriter"></div>
+        <div class="pre-sweep"></div>
+    </div>
+
+    <!-- WHATSAPP FLOAT -->
+    <a href="#" class="whatsapp-float">💬 WhatsApp Us</a>
+
+    <!-- NAVBAR -->
+    <header>
+        <a href="#" class="brand">DJA</a>
+        <div class="hamburger" id="menuToggle">
+            <span></span><span></span><span></span>
+        </div>
+    </header>
+    <div class="full-nav" id="fullNav">
+        <a href="#about" class="nav-link">ABOUT</a>
+        <a href="#services" class="nav-link">SERVICES</a>
+        <a href="#portfolio" class="nav-link">PORTFOLIO</a>
+        <a href="#process" class="nav-link">PROCESS</a>
+        <a href="#contact" class="nav-link">CONTACT</a>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-left">
+            <div class="hero-tag">[ EST. 2017 ]</div>
+            <h1 class="hero-title">
+                <span class="text-dark reveal-clip">WE BUILD</span>
+                <span class="stroke-text reveal-clip" style="transition-delay: 0.1s">DREAMS</span>
+                <span class="text-dark reveal-clip" style="transition-delay: 0.2s">INTO SPACES</span>
+            </h1>
+            <p class="hero-desc">Architecture &middot; Interiors &middot; Furniture &middot; Turnkey</p>
+            <div class="btn-group">
+                <a href="#portfolio" class="btn btn-solid">SEE OUR WORK &rarr;</a>
+                <a href="#contact" class="btn btn-outline">GET IN TOUCH</a>
+            </div>
+        </div>
+        <div class="hero-right">
+            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=80" class="hero-img" alt="Interior">
+            <div class="hero-img-overlay"></div>
+        </div>
+    </section>
+
+    <!-- MARQUEE TICKER -->
+    <div class="marquee-wrap">
+        <div class="marquee">
+            ARCHITECTURE &middot; INTERIOR DESIGN &middot; CUSTOMIZED FURNITURE &middot; TURNKEY PROJECTS &middot; GUJARAT &middot; 
+            ARCHITECTURE &middot; INTERIOR DESIGN &middot; CUSTOMIZED FURNITURE &middot; TURNKEY PROJECTS &middot; GUJARAT &middot; 
+        </div>
+    </div>
+
+    <!-- STATS TICKER -->
+    <section class="stats-section">
+        <div class="stats-wrap">
+            <div class="stat-block"><div class="stat-num counter" data-target="50">0</div><div class="stat-label">PROJECTS</div></div>
+            <div class="stat-block"><div class="stat-num counter" data-target="8">0</div><div class="stat-label">YEARS</div></div>
+            <div class="stat-block"><div class="stat-num counter" data-target="100">0</div><div class="stat-label">CLIENTS</div></div>
+            <div class="stat-block"><div class="stat-num counter" data-target="5">0</div><div class="stat-label">STATES</div></div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about" class="about-section">
+        <div class="about-grid">
+            <div class="img-grid-wrap">
+                <div class="img-yellow-box"></div>
+                <div class="img-frame">
+                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80" alt="Jay Aghara Studio" class="about-img y-parallax">
+                </div>
+            </div>
+            <div class="about-content">
+                <div class="about-tag">[ ABOUT US ]</div>
+                <h2 class="about-title reveal-clip">JAY AGHARA</h2>
+                <p class="about-text">A high-energy creative studio bringing Indian architectural heritage into the raw, bold edge of modern maximalism. We don't just dress rooms; we engineer vibrant lifestyles.</p>
+                <div class="about-quote">"Every space has a story. We write it in design."</div>
+                <a href="#about" class="btn btn-solid" style="padding: 15px 30px;">OUR STORY &rarr;</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" class="services-section">
+        <div class="sec-num">02</div>
+        <div class="service-bg-text">WE DO IT ALL.</div>
+        
+        <div class="services-list">
+            <div class="service-row srv-anim">
+                <div class="srv-num">01</div>
+                <div class="srv-title">ARCHITECTURE</div>
+                <div class="srv-desc">Creating structural masterpieces that command attention and defy convention.</div>
+                <div class="srv-arrow">&rarr;</div>
+            </div>
+            <div class="service-row srv-anim">
+                <div class="srv-num">02</div>
+                <div class="srv-title">INTERIOR DESIGN</div>
+                <div class="srv-desc">Vibrant, texture-rich environments that clash colors and cultures perfectly.</div>
+                <div class="srv-arrow">&rarr;</div>
+            </div>
+            <div class="service-row srv-anim">
+                <div class="srv-num">03</div>
+                <div class="srv-title">CUSTOMIZED FURNITURE</div>
+                <div class="srv-desc">Raw materials engineered into focal point statement pieces.</div>
+                <div class="srv-arrow">&rarr;</div>
+            </div>
+            <div class="service-row srv-anim">
+                <div class="srv-num">04</div>
+                <div class="srv-title">TURNKEY PROJECTS</div>
+                <div class="srv-desc">From raw concrete to high-end lifestyle completely managed by us.</div>
+                <div class="srv-arrow">&rarr;</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section id="portfolio" class="portfolio-section">
+        <div class="port-header">
+            <div class="about-tag">[ OUR WORK ]</div>
+            <h2 class="port-title"><span class="text-dark">SELECTED</span> <span class="stroke-text">PROJECTS</span></h2>
+        </div>
+        
+        <div class="filter-group">
+            <button class="pill active" data-filter="all">ALL</button>
+            <button class="pill" data-filter="residential">RESIDENTIAL</button>
+            <button class="pill" data-filter="commercial">COMMERCIAL</button>
+            <button class="pill" data-filter="furniture">FURNITURE</button>
+        </div>
+
+        <div class="port-grid">
+            <div class="port-item p-anim" data-cat="residential"><img src="https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1200&q=80" alt="Work" class="port-img"><div class="port-overlay"><div class="port-num">01</div><div class="port-name">Hina Bhavan</div></div></div>
+            <div class="port-item p-anim" data-cat="residential"><img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80" alt="Work" class="port-img"><div class="port-overlay"><div class="port-num">02</div><div class="port-name">Living Suite</div></div></div>
+            <div class="port-item p-anim" data-cat="commercial"><img src="https://images.unsplash.com/photo-1616137466211-f939a420be84?w=800&q=80" alt="Work" class="port-img"><div class="port-overlay"><div class="port-num">03</div><div class="port-name">Office Project</div></div></div>
+            <div class="port-item p-anim" data-cat="furniture"><img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80" alt="Work" class="port-img"><div class="port-overlay"><div class="port-num">04</div><div class="port-name">Master Bed</div></div></div>
+            <div class="port-item p-anim" data-cat="residential"><img src="https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=1200&q=80" alt="Work" class="port-img"><div class="port-overlay"><div class="port-num">05</div><div class="port-name">Prakruti Upvan</div></div></div>
+            <div class="port-item p-anim" data-cat="furniture"><img src="https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800&q=80" alt="Work" class="port-img"><div class="port-overlay"><div class="port-num">06</div><div class="port-name">Custom Build</div></div></div>
+            <div class="port-item p-anim" data-cat="commercial"><img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=80" alt="Work" class="port-img"><div class="port-overlay"><div class="port-num">07</div><div class="port-name">Lounge Area</div></div></div>
+        </div>
+    </section>
+
+    <!-- PROCESS -->
+    <section id="process" class="process-section">
+        <div class="process-head">
+            <div class="about-tag text-dark">[ HOW WE WORK ]</div>
+            <h2 class="process-title">THE PROCESS</h2>
+        </div>
+        
+        <div class="process-wrap">
+            <div class="process-step proc-anim"><div class="proc-num">01</div><div class="proc-name">Consultation</div><div class="proc-desc">Strategy & vision sync.</div></div>
+            <div class="proc-arrow">&rarr;</div>
+            <div class="process-step proc-anim" style="transition-delay:0.15s"><div class="proc-num">02</div><div class="proc-name">Design</div><div class="proc-desc">3D Renders & loud ideas.</div></div>
+            <div class="proc-arrow">&rarr;</div>
+            <div class="process-step proc-anim" style="transition-delay:0.3s"><div class="proc-num">03</div><div class="proc-name">Execution</div><div class="proc-desc">On-site heavy lifting.</div></div>
+            <div class="proc-arrow">&rarr;</div>
+            <div class="process-step proc-anim" style="transition-delay:0.45s"><div class="proc-num">04</div><div class="proc-name">Handover</div><div class="proc-desc">Keys to the dream.</div></div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="test-section">
+        <div class="test-container">
+            <div class="main-quote">
+                <div class="quote-mark">"</div>
+                <div class="main-q-text">Jay and his team transformed our apartment into a vibrant, textural masterpiece. Not just interior design, but art.</div>
+                <div class="main-q-author">RAVI MEHTA / RESIDENTIAL VADODARA</div>
+            </div>
+            
+            <div class="sub-quotes">
+                <div class="sub-card">
+                    <p>"A corporate office that feels like a creative powerhouse."</p>
+                    <span>Priya Shah / Commercial</span>
+                </div>
+                <div class="sub-card">
+                    <p>"The boldest architectural firm in Gujarat, period."</p>
+                    <span>Arjun Patel / Turnkey Villa</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="contact-section">
+        <div class="cont-left">
+            <h2 class="cont-title">
+                <span class="text-white">LET'S</span>
+                <span class="text-orange">BUILD</span>
+                <span class="stroke-white">TOGETHER.</span>
+            </h2>
+            <div class="cont-details">📍 GUJARAT, INDIA <br>📞 +91 999 999 9999 <br>✉️ HELLO@DJA.COM</div>
+        </div>
+        <div class="cont-right">
+            <form>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Phone</label><input type="tel" class="form-control" required></div>
+                </div>
+                <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" required></div>
+                <div class="form-group">
+                    <label class="form-label">Project Type</label>
+                    <select class="form-control" required>
+                        <option value="">Select...</option>
+                        <option>Residential</option><option>Commercial</option><option>Turnkey</option>
+                    </select>
+                </div>
+                <div class="form-group"><label class="form-label">Message</label><textarea class="form-control" rows="2" required></textarea></div>
+                <button type="submit" class="btn-submit">SEND ENQUIRY &rarr;</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <!-- MARQUEE REVERSE -->
+        <div class="marquee-wrap" style="border-top:none; border-bottom: 2px solid var(--white)">
+            <div class="marquee reverse">
+                ARCHITECTURE &middot; INTERIOR DESIGN &middot; CUSTOMIZED FURNITURE &middot; TURNKEY PROJECTS &middot; GUJARAT &middot; 
+                ARCHITECTURE &middot; INTERIOR DESIGN &middot; CUSTOMIZED FURNITURE &middot; TURNKEY PROJECTS &middot; GUJARAT &middot; 
+            </div>
+        </div>
+        
+        <div class="footer-watermark">DJA</div>
+        
+        <div class="footer-bottom">
+            <div class="f-logo">DJA</div>
+            <div class="f-copy">&copy; 2026 DESIGNS OF JAY AGHARA</div>
+            <div class="f-links">
+                <a href="#about">About</a><a href="#portfolio">Works</a><a href="#contact">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JS -->
+    <script>
+        // TYPEWRITER & PRELOADER
+        const text = "DESIGNS OF JAY AGHARA";
+        const target = document.getElementById("typewriter");
+        let i = 0;
+        setTimeout(() => {
+            const typer = setInterval(() => {
+                if(i < text.length) { target.innerHTML += text.charAt(i); i++; } 
+                else { clearInterval(typer); }
+            }, 50);
+        }, 800);
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('slide-up');
+                setTimeout(() => document.querySelectorAll('.reveal-clip').forEach(el => el.classList.add('active')), 500);
+            }, 2800);
+        });
+
+        // CURSOR & PROGRESS
+        const dot = document.querySelector('.cursor-dot');
+        const follower = document.querySelector('.cursor-follower');
+        const progressBar = document.getElementById('scrollProgress');
+        
+        let mx = 0, my = 0, fx = 0, fy = 0;
+        window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.transform = `translate(${mx}px, ${my}px)`; });
+        
+        function tick() {
+            fx += (mx - fx) * 0.15; fy += (my - fy) * 0.15;
+            follower.style.transform = `translate(${fx}px, ${fy}px)`;
+            requestAnimationFrame(tick);
+        }
+        tick();
+
+        document.querySelectorAll('a, button, .port-item').forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+        });
+
+        window.addEventListener('scroll', () => {
+            const scrollPx = document.documentElement.scrollTop;
+            const winHeightScroll = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            progressBar.style.width = `${(scrollPx / winHeightScroll) * 100}%`;
+        });
+
+        // MENU TOGGLE
+        const menuBtn = document.getElementById('menuToggle');
+        const nav = document.getElementById('fullNav');
+        menuBtn.addEventListener('click', () => { nav.classList.toggle('open'); });
+        document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', () => nav.classList.remove('open')); });
+
+        // INTERSECTION OBSERVERS
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    if(entry.target.classList.contains('srv-anim')) entry.target.classList.add('slide-in');
+                    if(entry.target.classList.contains('p-anim')) entry.target.classList.add('zoom-in');
+                    if(entry.target.classList.contains('proc-anim')) entry.target.classList.add('slide-up');
+                    
+                    if(entry.target.classList.contains('counter')) {
+                        const target = +entry.target.getAttribute('data-target');
+                        let count = 0;
+                        const inc = target / 50;
+                        const timer = setInterval(() => {
+                            count += inc;
+                            if(count >= target) { entry.target.innerText = target; clearInterval(timer); } 
+                            else { entry.target.innerText = Math.ceil(count); }
+                        }, 30);
+                        io.unobserve(entry.target);
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.srv-anim, .p-anim, .proc-anim, .counter').forEach(el => io.observe(el));
+
+        // PORTFOLIO FILTER
+        const pills = document.querySelectorAll('.pill');
+        const ports = document.querySelectorAll('.port-item');
+
+        pills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                pills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                const flt = pill.getAttribute('data-filter');
+
+                let delay = 0;
+                ports.forEach(port => {
+                    port.classList.remove('zoom-in');
+                    setTimeout(() => {
+                        if(flt === 'all' || port.getAttribute('data-cat') === flt) {
+                            port.classList.remove('hidden');
+                            setTimeout(() => port.classList.add('zoom-in'), 50);
+                        } else {
+                            port.classList.add('hidden');
+                        }
+                    }, 300);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
